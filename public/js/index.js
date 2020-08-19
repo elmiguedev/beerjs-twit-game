@@ -1,6 +1,10 @@
 var socket;
 var game;
 
+/**
+ * Inicializa la configuracion del socket que escucha
+ * las respuestas de los tweets de la API de twitter
+ *  */
 function configureSockets() {
     socket = io();
     socket.on("tweet", (tweet) => {
@@ -8,7 +12,12 @@ function configureSockets() {
     })
 }
 
+/**
+ * Inicializa la configuracion del juego
+ */
 function configureGame() {
+
+    // Crea el canvas del juego
     game = new Phaser.Game({
         type: Phaser.AUTO,
         width: 1280,
@@ -19,66 +28,102 @@ function configureGame() {
             update: update
         }
     });
-}
 
-function preload() {
-    this.load.image('marco', '../img/marco.png');
-    this.load.image('cerveza', '../img/cerveza.png');
-}
+    // Bucle principal del juego
+    // -------------------------------------
 
-var burbujas = [];
-var burbujasContainer;
-var cantidadBurbujasEfecto = 35;
-function create() {
-
-    this.cameras.main.setBackgroundColor('#F9D628');
-
-    var containerWidth = 300;
-    var containerHeight = 400;
-
-    var ubicacionX = 168;
-    var ubicacionY = 500;
-
-    // el fondo de la cerveza seria esto., y deberia ir creciendo (o subiendo)
-    // this.water = this.add.graphics();
-    // this.water.fillStyle(0x1155ae)
-    //     .fillRect(0, 0, containerWidth, containerHeight);
-    this.cerveza = this.add.image(ubicacionX, ubicacionY + 40, 'cerveza').setOrigin(0);
-
-    for (let i = 0; i < cantidadBurbujasEfecto; i++) {
-        const burbuja = this.add.graphics(containerWidth / 2, containerHeight / 3);
-
-        cr = containerWidth / 9
-
-        burbuja
-            .setPosition(
-                (containerWidth / cantidadBurbujasEfecto * i) + ubicacionX,
-                (containerHeight / 6 * (Math.random() * 0.05 + 0.95)) + ubicacionY
-            )
-            .fillStyle(0xffffff, 0.85)
-            .fillRoundedRect(-containerWidth / 8, -containerWidth / 8, containerWidth / 4, containerWidth / 4, { tl: cr, tr: cr, bl: cr, br: cr })
-
-        burbuja.rang = Phaser.Math.Between(0, 360);
-        burbuja.rangrate = Phaser.Math.Between(10, 20);
-        burbujas.push(burbuja)
+    function preload() {
+        this.load.image('marco', '../img/marco.png');
+        this.load.image('cerveza', '../img/cerveza.png');
     }
 
-    burbujasContainer = this.add.container().add(burbujas)
+    function create() {
 
+        // crea el contenedor de las cervezas
+        this.cervezas = {};
 
-    // crea el marco
-    this.add.image(0, 0, 'marco').setOrigin(0);
-}
+        // crea las birritas
+        this.cervezas.player1 = crearCerveza(this, 168, 500);
+        this.cervezas.player2 = crearCerveza(this, 770, 500);
 
-function update() {
-    for (key in burbujas) {
-        let burbuja = burbujas[key]
-        burbuja.setAngle(burbuja.rang + ((Date.now() / burbuja.rangrate) % 360))
+        // crea el marco del juego
+        crearMarco(this);
+
     }
 
-    // this.cerveza.y -= 0.2;
-    // burbujasContainer.y -= 0.2;
+    function update() {
+        this.cervezas.player1.moverBurbujas();
+        this.cervezas.player1.subir();
+        this.cervezas.player2.moverBurbujas();
+        this.cervezas.player2.subir();
+    }
+
+    // Metodos del juego
+    // --------------------------------
+
+    // crea una cerveza del juego
+    function crearCerveza(scene, x, y) {
+
+        // dimensiones de la cerveza
+        const containerWidth = 300;
+        const containerHeight = 400;
+        const cantidadBurbujasEfecto = 35;
+        const burbujas = [];
+
+        // crea la cerveza 🍻 (o sea, el liquido xD)
+        const cerveza = scene.add.image(x, y + 40, "cerveza").setOrigin(0);
+
+        // crea las burbujas
+        for (let i = 0; i < cantidadBurbujasEfecto; i++) {
+            const burbuja = scene.add.graphics(containerWidth / 2, containerHeight / 3);
+            const cr = containerWidth / 9
+
+            burbuja
+                .setPosition(
+                    (containerWidth / cantidadBurbujasEfecto * i) + x,
+                    (containerHeight / 6 * (Math.random() * 0.05 + 0.95)) + y
+                )
+                .fillStyle(0xffffff, 0.85)
+                .fillRoundedRect(-containerWidth / 8, -containerWidth / 8, containerWidth / 4, containerWidth / 4, { tl: cr, tr: cr, bl: cr, br: cr })
+
+            burbuja.rang = Phaser.Math.Between(0, 360);
+            burbuja.rangrate = Phaser.Math.Between(10, 20);
+            burbujas.push(burbuja)
+
+        }
+
+        // agrega las burbucas al contenedor principal
+        const contenedor = scene.add.container();
+        contenedor.add(cerveza);
+        contenedor.add(burbujas);
+
+        // metodos de la entidad
+        contenedor.moverBurbujas = function () {
+            for (key in burbujas) {
+                const b = burbujas[key]
+                b.setAngle(b.rang + ((Date.now() / b.rangrate) % 360))
+            }
+        }
+
+        contenedor.subir = function (factor) {
+            if (!factor) factor = 1;
+            contenedor.y -= 0.1 * factor;
+        }
+
+        // retorna todo el contenedor, que es el que se va a mover
+        return contenedor;
+    }
+
+    // crea el marco del juego
+    function crearMarco(scene) {
+        scene.cameras.main.setBackgroundColor('#F9D628');
+        scene.add.image(0, 0, 'marco').setOrigin(0);
+    }
+
+
 }
+
+
 
 // init
 configureGame();
