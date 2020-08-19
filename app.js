@@ -33,11 +33,22 @@ function configureSocket() {
 
 
 function configureRules() {
-    const stream = twit.stream('statuses/filter', { track: '#Javascript' });
-    stream.on("tweet", (tweet) => {
-        io.emit("tweet", getTweetInfo(tweet));
-        // console.log(getTweetInfo(tweet));
+
+    const claves = {
+        player1: "#javascript",
+        player2: "#python"
+    }
+
+    const stream_1 = twit.stream('statuses/filter', { track: claves.player1 });
+    stream_1.on("tweet", (tweet) => {
+        io.emit("tweet_player_1", getTweetInfo(tweet));
     });
+
+    const stream_2 = twit.stream('statuses/filter', { track: claves.player2 });
+    stream_2.on("tweet", (tweet) => {
+        io.emit("tweet_player_2", getTweetInfo(tweet));
+    });
+
 }
 
 function getTweetInfo(tweet) {

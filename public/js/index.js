@@ -1,16 +1,4 @@
-var socket;
 var game;
-
-/**
- * Inicializa la configuracion del socket que escucha
- * las respuestas de los tweets de la API de twitter
- *  */
-function configureSockets() {
-    socket = io();
-    socket.on("tweet", (tweet) => {
-        // console.log(tweet);
-    })
-}
 
 /**
  * Inicializa la configuracion del juego
@@ -49,13 +37,14 @@ function configureGame() {
         // crea el marco del juego
         crearMarco(this);
 
+        // crea el socket del juego
+        crearSocket(this);
+
     }
 
     function update() {
         this.cervezas.player1.moverBurbujas();
-        this.cervezas.player1.subir();
         this.cervezas.player2.moverBurbujas();
-        this.cervezas.player2.subir();
     }
 
     // Metodos del juego
@@ -120,11 +109,20 @@ function configureGame() {
         scene.add.image(0, 0, 'marco').setOrigin(0);
     }
 
-
+    // crea el socket del juego
+    function crearSocket(scene) {
+        scene.socket = io();
+        scene.socket.on("tweet_player_1", (tweet) => {
+            console.log(tweet.screenName);
+            scene.cervezas.player1.subir(20);
+        });
+        scene.socket.on("tweet_player_2", (tweet) => {
+            console.log(tweet.screenName);
+            scene.cervezas.player2.subir(20);
+        });
+    }
 }
-
 
 
 // init
 configureGame();
-configureSockets();
