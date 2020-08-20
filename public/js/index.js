@@ -22,17 +22,30 @@ function configureGame() {
 
     function preload() {
         this.load.image('marco', '../img/marco.png');
+        this.load.image('marco-simple', '../img/marco-simple.png');
+        this.load.image('pajaro', '../img/pajaro.png');
+        this.load.image('mesa', '../img/mesa.png');
         this.load.image('cerveza', '../img/cerveza.png');
+        this.load.spritesheet("chancho", "../img/chancho-pet.png", {
+            frameWidth:351,
+            frameHeight: 256,
+            margin: 0,
+            spacing: 0
+        });
+
     }
 
     function create() {
+
+        // crea las animaciones
+        crearAnimaciones(this);
 
         // crea el contenedor de las cervezas
         this.cervezas = {};
 
         // crea las birritas
         this.cervezas.player1 = crearCerveza(this, 168, 500);
-        this.cervezas.player2 = crearCerveza(this, 770, 500);
+        // this.cervezas.player2 = crearCerveza(this, 770, 500);
 
         // crea el marco del juego
         crearMarco(this);
@@ -40,15 +53,30 @@ function configureGame() {
         // crea el socket del juego
         crearSocket(this);
 
+        // crea el container de chanchos
+        this.chanchos = this.add.group({
+            active: true,
+            runChildUpdate: true,
+        })
     }
 
     function update() {
         this.cervezas.player1.moverBurbujas();
-        this.cervezas.player2.moverBurbujas();
+        // this.cervezas.player2.moverBurbujas();
     }
 
     // Metodos del juego
     // --------------------------------
+
+    // crea el set de animaciones
+    function crearAnimaciones(scene) {
+        scene.anims.create({
+            key: "chancho-jump",
+            frameRate: 11,
+            frames: scene.anims.generateFrameNumbers("chancho", { frames: [1,2,3,4,5,6,7,8,9,10,11] }),
+            repeat: -1
+        });
+    }
 
     // crea una cerveza del juego
     function crearCerveza(scene, x, y) {
@@ -106,7 +134,9 @@ function configureGame() {
     // crea el marco del juego
     function crearMarco(scene) {
         scene.cameras.main.setBackgroundColor('#F9D628');
-        scene.add.image(0, 0, 'marco').setOrigin(0);
+        scene.add.image(0, 473, 'mesa').setOrigin(0).setDepth(-10);
+        // scene.add.image(0, 0, 'marco').setOrigin(0);
+        scene.add.image(0, 0, 'marco-simple').setOrigin(0);
     }
 
     // crea el socket del juego
@@ -114,13 +144,85 @@ function configureGame() {
         scene.socket = io();
         scene.socket.on("tweet_player_1", (tweet) => {
             console.log(tweet.screenName);
-            scene.cervezas.player1.subir(20);
+            scene.cervezas.player1.subir(40);
+            crearChancho(scene,tweet.screenName);
         });
-        scene.socket.on("tweet_player_2", (tweet) => {
-            console.log(tweet.screenName);
-            scene.cervezas.player2.subir(20);
-        });
+        // scene.socket.on("tweet_player_2", (tweet) => {
+        //     console.log(tweet.screenName);
+        //     scene.cervezas.player2.subir(40);
+        //     crearChancho(scene,tweet.screenName);
+        // });
     }
+
+    // crea el chancho del usuario
+    function crearChancho(scene, nombre) {
+        const velocidad = Phaser.Math.Between(1,3);
+        const contadorMax = 1;
+        let x = 1280;
+        let y = 620 + Phaser.Math.Between(-50,50);
+        const chancho = scene.add.sprite(x,y,"chancho").setScale(0.5);
+        scene.chanchos.add(chancho);
+        
+        chancho.direccion = -1;
+        chancho.contador = 0;
+        chancho.nombre = crearNombre(scene,  chancho.x, chancho.y -60,nombre);
+
+        if (Phaser.Math.Between(0,1) == 0) {
+            chancho.x = 0;
+             chancho.setFlipX(true);
+             chancho.direccion = 1;
+            }
+            
+            chancho.anims.play("chancho-jump", true);
+            
+            chancho.update = function() {
+                chancho.x += chancho.direccion * velocidad;
+                chancho.nombre.mover(chancho.x);
+
+                if (chancho.x < 0 || chancho.x > 1280) {
+                    chancho.setFlipX(!chancho.flipX);
+                chancho.contador++;
+                chancho.direccion = chancho.direccion * (-1);
+
+                if (chancho.contador >=contadorMax) {
+                    chancho.nombre.destroy();
+                    chancho.destroy();
+                }
+            } 
+        }
+
+
+
+        return chancho;
+    }
+
+    function crearNombre(scene, x, y, nombre) {
+
+        var p = scene.add.image(x-80,y,'pajaro');
+        var texto = scene.add.text(x-50, y-15, nombre, { 
+            fontFamily: 'Arial', 
+            fontStyle: 'bold', 
+            fontSize: 30, 
+            color: 'black',
+            backgroundColor: 'white' ,
+            padding: 2
+        });
+ 
+        return {
+            p: p, 
+            texto: texto, 
+            mover: function(x) {
+                p.x = x-80; texto.x = x-50;
+            },
+            destroy: function() {
+                p.destroy();
+                texto.destroy();
+            }
+        };
+        
+    }
+
+    
 }
 
 
