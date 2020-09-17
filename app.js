@@ -35,8 +35,8 @@ function configureSocket() {
 function configureRules() {
 
     const claves = {
-        player1: "#javascript",
-        player2: "#python"
+        player1: "#beerjscba",
+        player2: "@beerjscba"
     }
 
     const stream_1 = twit.stream('statuses/filter', { track: claves.player1 });

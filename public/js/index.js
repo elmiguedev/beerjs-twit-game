@@ -26,8 +26,9 @@ function configureGame() {
         this.load.image('pajaro', '../img/pajaro.png');
         this.load.image('mesa', '../img/mesa.png');
         this.load.image('cerveza', '../img/cerveza.png');
+        this.load.image('mensaje', '../img/mensaje.png');
         this.load.spritesheet("chancho", "../img/chancho-pet.png", {
-            frameWidth:351,
+            frameWidth: 351,
             frameHeight: 256,
             margin: 0,
             spacing: 0
@@ -36,6 +37,7 @@ function configureGame() {
     }
 
     function create() {
+
 
         // crea las animaciones
         crearAnimaciones(this);
@@ -58,6 +60,9 @@ function configureGame() {
             active: true,
             runChildUpdate: true,
         })
+
+        crearTitulo(this);
+
     }
 
     function update() {
@@ -68,12 +73,16 @@ function configureGame() {
     // Metodos del juego
     // --------------------------------
 
+    function crearTitulo(scene) {
+        scene.add.image(900, 250, "mensaje");
+    }
+
     // crea el set de animaciones
     function crearAnimaciones(scene) {
         scene.anims.create({
             key: "chancho-jump",
             frameRate: 11,
-            frames: scene.anims.generateFrameNumbers("chancho", { frames: [1,2,3,4,5,6,7,8,9,10,11] }),
+            frames: scene.anims.generateFrameNumbers("chancho", { frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }),
             repeat: -1
         });
     }
@@ -124,7 +133,9 @@ function configureGame() {
 
         contenedor.subir = function (factor) {
             if (!factor) factor = 1;
-            contenedor.y -= 0.1 * factor;
+            console.log(contenedor.y);
+            if (contenedor.y >= -300)
+                contenedor.y -= 0.3 * factor;
         }
 
         // retorna todo el contenedor, que es el que se va a mover
@@ -145,50 +156,50 @@ function configureGame() {
         scene.socket.on("tweet_player_1", (tweet) => {
             console.log(tweet.screenName);
             scene.cervezas.player1.subir(40);
-            crearChancho(scene,tweet.screenName);
+            crearChancho(scene, tweet.screenName);
         });
-        // scene.socket.on("tweet_player_2", (tweet) => {
-        //     console.log(tweet.screenName);
-        //     scene.cervezas.player2.subir(40);
-        //     crearChancho(scene,tweet.screenName);
-        // });
+        scene.socket.on("tweet_player_2", (tweet) => {
+            console.log(tweet.screenName);
+            scene.cervezas.player1.subir(40);
+            crearChancho(scene, tweet.screenName);
+        });
     }
 
     // crea el chancho del usuario
     function crearChancho(scene, nombre) {
-        const velocidad = Phaser.Math.Between(1,3);
+        const velocidad = Phaser.Math.Between(1, 3);
         const contadorMax = 1;
         let x = 1280;
-        let y = 620 + Phaser.Math.Between(-50,50);
-        const chancho = scene.add.sprite(x,y,"chancho").setScale(0.5);
+        let y = 620 + Phaser.Math.Between(-50, 50);
+        const chancho = scene.add.sprite(x, y, "chancho").setScale(0.5);
         scene.chanchos.add(chancho);
-        
+
         chancho.direccion = -1;
         chancho.contador = 0;
-        chancho.nombre = crearNombre(scene,  chancho.x, chancho.y -60,nombre);
+        chancho.nombre = crearNombre(scene, chancho.x, chancho.y - 60, nombre);
 
-        if (Phaser.Math.Between(0,1) == 0) {
+        if (Phaser.Math.Between(0, 1) == 0) {
             chancho.x = 0;
-             chancho.setFlipX(true);
-             chancho.direccion = 1;
-            }
-            
-            chancho.anims.play("chancho-jump", true);
-            
-            chancho.update = function() {
-                chancho.x += chancho.direccion * velocidad;
-                chancho.nombre.mover(chancho.x);
+            chancho.setFlipX(true);
+            chancho.direccion = 1;
+        }
 
-                if (chancho.x < 0 || chancho.x > 1280) {
-                    chancho.setFlipX(!chancho.flipX);
+        chancho.anims.play("chancho-jump", true);
+
+        chancho.update = function () {
+            chancho.x += chancho.direccion * velocidad;
+            chancho.nombre.mover(chancho.x);
+
+            if (chancho.x < 0 || chancho.x > 1280) {
+                chancho.setFlipX(!chancho.flipX);
                 chancho.contador++;
                 chancho.direccion = chancho.direccion * (-1);
 
-                if (chancho.contador >=contadorMax) {
+                if (chancho.contador >= contadorMax) {
                     chancho.nombre.destroy();
                     chancho.destroy();
                 }
-            } 
+            }
         }
 
 
@@ -198,31 +209,31 @@ function configureGame() {
 
     function crearNombre(scene, x, y, nombre) {
 
-        var p = scene.add.image(x-80,y,'pajaro');
-        var texto = scene.add.text(x-50, y-15, nombre, { 
-            fontFamily: 'Arial', 
-            fontStyle: 'bold', 
-            fontSize: 30, 
+        var p = scene.add.image(x - 80, y, 'pajaro');
+        var texto = scene.add.text(x - 50, y - 15, nombre, {
+            fontFamily: 'Arial',
+            fontStyle: 'bold',
+            fontSize: 30,
             color: 'black',
-            backgroundColor: 'white' ,
+            backgroundColor: 'white',
             padding: 2
         });
- 
+
         return {
-            p: p, 
-            texto: texto, 
-            mover: function(x) {
-                p.x = x-80; texto.x = x-50;
+            p: p,
+            texto: texto,
+            mover: function (x) {
+                p.x = x - 80; texto.x = x - 50;
             },
-            destroy: function() {
+            destroy: function () {
                 p.destroy();
                 texto.destroy();
             }
         };
-        
+
     }
 
-    
+
 }
 
 
