@@ -34,6 +34,8 @@ function configureSocket() {
 
 function configureRules() {
 
+    console.log("configurando twitter");
+
     const claves = {
         player1: "#beerjscba",
         player2: "@beerjscba"
@@ -41,6 +43,7 @@ function configureRules() {
 
     const stream_1 = twit.stream('statuses/filter', { track: claves.player1 });
     stream_1.on("tweet", (tweet) => {
+        console.log('TWEET', tweet);
         io.emit("tweet_player_1", getTweetInfo(tweet));
     });
 
@@ -65,10 +68,10 @@ function startServer() {
 
     configureRoutes();
     configureSocket();
+    configureRules();
 
     // run server
     server.listen(process.env.PORT, function () {
-        configureRules();
         console.log(`Listening on ${server.address().port}`);
     });
 }
