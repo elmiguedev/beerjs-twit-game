@@ -21,6 +21,7 @@ function configureGame() {
     // -------------------------------------
 
     function preload() {
+        this.load.audio('song', ['../sounds/notpunk.mp3']);
         this.load.image('marco', '../img/marco.png');
         this.load.image('marco-simple', '../img/marco-simple.png');
         this.load.image('pajaro', '../img/pajaro.png');
@@ -37,6 +38,7 @@ function configureGame() {
     }
 
     function create() {
+
 
 
         // crea las animaciones
@@ -63,6 +65,8 @@ function configureGame() {
 
         crearTitulo(this);
 
+        crearMusica(this);
+
     }
 
     function update() {
@@ -72,6 +76,11 @@ function configureGame() {
 
     // Metodos del juego
     // --------------------------------
+
+    function crearMusica(scene) {
+        const song = scene.sound.add("song");
+        song.play();
+    }
 
     function crearTitulo(scene) {
         scene.add.image(900, 250, "mensaje");
