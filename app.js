@@ -72,7 +72,7 @@ function startServer() {
     server.listen(process.env.PORT, function () {
         setInterval(() => {
             console.log("tick")
-        }, 5000);
+        }, 1000);
         console.log(`Listening on ${server.address().port}`);
     });
 }
