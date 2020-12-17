@@ -46,6 +46,7 @@ function configureRules() {
 
     const stream_2 = twit.stream('statuses/filter', { track: claves.player2 });
     stream_2.on("tweet", (tweet) => {
+        console.log('TWEET', tweet);
         io.emit("tweet_player_2", getTweetInfo(tweet));
     });
 
