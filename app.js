@@ -37,17 +37,19 @@ function configureRules() {
     console.log("configurando twitter");
 
     const claves = {
-        player1: "#python",
-        player2: "#javascript"
+        player1: "#Javascript",
+        player2: "#Python"
     }
 
     const stream_1 = twit.stream('statuses/filter', { track: claves.player1 });
     stream_1.on("tweet", (tweet) => {
+        console.log('TWEET', tweet);
         io.emit("tweet_player_1", getTweetInfo(tweet));
     });
 
     const stream_2 = twit.stream('statuses/filter', { track: claves.player2 });
     stream_2.on("tweet", (tweet) => {
+        console.log('TWEET', tweet);
         io.emit("tweet_player_2", getTweetInfo(tweet));
     });
 
@@ -71,7 +73,7 @@ function startServer() {
     // run server
     server.listen(process.env.PORT, function () {
         setInterval(() => {
-            console.log("tick")
+            console.log("pruebita")
         }, 1000);
         console.log(`Listening on ${server.address().port}`);
     });
