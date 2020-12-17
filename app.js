@@ -73,7 +73,6 @@ function startServer() {
     // run server
     server.listen(process.env.PORT, function () {
         setInterval(() => {
-            console.log("pruebita")
         }, 1000);
         console.log(`Listening on ${server.address().port}`);
     });
