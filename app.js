@@ -37,7 +37,7 @@ function configureRules() {
     console.log("configurando twitter");
 
     const claves = {
-        player1: "#beerjscba",
+        player1: "#DevMusic",
         player2: "@beerjscba"
     }
 
