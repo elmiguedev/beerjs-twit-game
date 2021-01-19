@@ -67,12 +67,13 @@ function getTweetInfo(tweet) {
 function startServer() {
 
     configureRoutes();
-    configureSocket();
-    configureRules();
+
 
     // run server
     server.listen(process.env.PORT, function () {
         console.log(`Listening on ${server.address().port}`);
+        configureSocket();
+        configureRules();
     });
 }
 
