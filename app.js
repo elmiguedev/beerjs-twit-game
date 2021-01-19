@@ -30,8 +30,6 @@ function configureSocket() {
     });
 }
 
-
-
 function configureRules() {
 
     console.log("configurando twitter");
@@ -67,13 +65,11 @@ function getTweetInfo(tweet) {
 function startServer() {
 
     configureRoutes();
-    configureSocket();
-    configureRules();
+    // configureSocket();
+    // configureRules();
 
     // run server
     server.listen(process.env.PORT, function () {
-        setInterval(() => {
-        }, 1000);
         console.log(`Listening on ${server.address().port}`);
     });
 }
