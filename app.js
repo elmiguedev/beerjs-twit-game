@@ -1,5 +1,5 @@
 // get environment variables
-require("dotenv").config();
+// require("dotenv").config();
 
 // import http and express
 const express = require("express");
