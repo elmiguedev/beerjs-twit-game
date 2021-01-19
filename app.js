@@ -35,6 +35,8 @@ function configureRules() {
     console.log("configurando twitter");
 
     const claves = {
+        // player1: "#beerjscba",
+        // player2: "@beerjscba"
         player1: "#beerjscba",
         player2: "@beerjscba"
     }
@@ -65,8 +67,8 @@ function getTweetInfo(tweet) {
 function startServer() {
 
     configureRoutes();
-    // configureSocket();
-    // configureRules();
+    configureSocket();
+    configureRules();
 
     // run server
     server.listen(process.env.PORT, function () {
