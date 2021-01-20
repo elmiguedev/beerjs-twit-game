@@ -16,11 +16,21 @@ const twit = new Twit({
     access_token_secret: process.env.TWIT_ACCESS_TOKEN_SECRET
 });
 
+const streams = {
+    stream_1: null,
+    stream_2: null
+}
+
 // declare config functions
 function configureRoutes() {
     app.use(express.static('public'));
     app.get("/test", (req, res) => {
         res.send("test");
+    });
+    app.get("/stop", (req, res) => {
+        streams.stream_1.stop();
+        streams.stream_2.stop();
+        res.send("stopped");
     });
 }
 
@@ -37,18 +47,18 @@ function configureRules() {
     const claves = {
         // player1: "#beerjscba",
         // player2: "@beerjscba"
-        player1: "#javascript",
-        player2: "#python"
+        player1: "#DevMusic",
+        player2: "#devmusic"
     }
 
-    const stream_1 = twit.stream('statuses/filter', { track: claves.player1 });
-    stream_1.on("tweet", (tweet) => {
+    streams.stream_1 = twit.stream('statuses/filter', { track: claves.player1 });
+    streams.stream_1.on("tweet", (tweet) => {
         console.log('TWEET', tweet);
         io.emit("tweet_player_1", getTweetInfo(tweet));
     });
 
-    const stream_2 = twit.stream('statuses/filter', { track: claves.player2 });
-    stream_2.on("tweet", (tweet) => {
+    streams.stream_2 = twit.stream('statuses/filter', { track: claves.player2 });
+    streams.stream_2.on("tweet", (tweet) => {
         console.log('TWEET', tweet);
         io.emit("tweet_player_2", getTweetInfo(tweet));
     });
